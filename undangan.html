@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 10px;
             padding: 0;
             background-color: #f4f4f4;
         }
@@ -22,32 +22,56 @@
             padding: 10px;
             font-size: 16px;
         }
-        textarea {
-            height: 200px;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
         button {
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
             padding: 10px;
+            border-radius: 5px;
         }
         button:hover {
             background-color: #0056b3;
         }
-        .copy-btn {
-            margin-top: 10px;
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td button {
             background-color: #28a745;
         }
-        .copy-btn:hover {
+        td button:hover {
             background-color: #218838;
+        }
+        .whatsapp-btn {
+            background-color: #25d366;
+            color: white;
+        }
+        .whatsapp-btn:hover {
+            background-color: #1ebd5b;
+        }
+        @media only screen and (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            th, td {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            tr {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -55,32 +79,40 @@
     <h1>Undangan Online Generator</h1>
     <p>Masukkan daftar nama tamu (pisahkan dengan baris baru):</p>
     <textarea id="guestList" placeholder="Contoh:&#10;Gery Reza Pahlevi&#10;Titania Sai Dipri"></textarea>
-    <button onclick="generateInvitations()">Generate Undangan</button>
-    <div class="output">
-        <h3>Hasil Undangan:</h3>
-        <textarea id="outputArea" readonly placeholder="Hasil undangan akan muncul di sini..."></textarea>
-        <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
-    </div>
+    <button onclick="generateTable()">Generate Undangan</button>
+    <table id="invitationTable">
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>Undangan</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
     <script>
-        function generateInvitations() {
+        function generateTable() {
             const baseUrl = "https://undanganonlineaja.id/titania-bukhari?to=";
             const guestList = document.getElementById("guestList").value.split("\n");
-            let invitations = "";
+            const tableBody = document.querySelector("#invitationTable tbody");
+
+            // Clear existing rows
+            tableBody.innerHTML = "";
 
             guestList.forEach(guest => {
                 if (guest.trim() !== "") {
                     const encodedName = encodeURIComponent(guest.trim());
-                    invitations += `
-_Bismillahirrahmanirrahim_
-_Assalamualaikum, Wr. Wb_
-*Kepada Yth. ${guest} *
+                    const invitation = `
+Bismillahirrahmanirrahim
+Assalamualaikum, Wr. Wb
+Kepada Yth. ${guest}
 Di Tempat
 
 Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara kami.
 
 Berikut link undangan kami, untuk info lengkap dari acara bisa kunjungi:
-${baseUrl}${encodedName} 
+${baseUrl}${encodedName}
 
 Merupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.
 
@@ -88,24 +120,60 @@ Mohon maaf perihal undangan hanya di bagikan melalui pesan ini.
 
 Terima kasih banyak atas perhatiannya.
 
-_Wassalamualaikum Wr.Wb._
+Wassalamualaikum Wr.Wb.
 
-*Kami yang berbahagia,*
-*Titania & Bukhari*
+Kami yang berbahagia,
+Titania & Bukhari
+                    `;
 
---------------------------------------------------------------
-`;
+                    // Create table row
+                    const row = document.createElement("tr");
+
+                    // Add name cell
+                    const nameCell = document.createElement("td");
+                    nameCell.textContent = guest.trim();
+                    row.appendChild(nameCell);
+
+                    // Add invitation cell
+                    const invitationCell = document.createElement("td");
+                    const invitationText = document.createElement("textarea");
+                    invitationText.value = invitation.trim();
+                    invitationText.readOnly = true;
+                    invitationText.style.width = "100%";
+                    invitationText.style.height = "150px";
+                    invitationCell.appendChild(invitationText);
+                    row.appendChild(invitationCell);
+
+                    // Add action buttons cell
+                    const actionCell = document.createElement("td");
+                    
+                    // Copy Button
+                    const copyButton = document.createElement("button");
+                    copyButton.textContent = "Copy";
+                    copyButton.onclick = () => {
+                        invitationText.select();
+                        document.execCommand("copy");
+                        alert(`Undangan untuk ${guest.trim()} berhasil disalin!`);
+                    };
+                    actionCell.appendChild(copyButton);
+
+                    // WhatsApp Button
+                    const whatsappButton = document.createElement("button");
+                    whatsappButton.textContent = "Send via WhatsApp";
+                    whatsappButton.className = "whatsapp-btn";
+                    whatsappButton.onclick = () => {
+                        const whatsappText = encodeURIComponent(invitation.trim());
+                        const whatsappUrl = `https://wa.me/?text=${whatsappText}`;
+                        window.open(whatsappUrl, "_blank");
+                    };
+                    actionCell.appendChild(whatsappButton);
+
+                    row.appendChild(actionCell);
+
+                    // Append row to table body
+                    tableBody.appendChild(row);
                 }
             });
-
-            document.getElementById("outputArea").value = invitations.trim();
-        }
-
-        function copyToClipboard() {
-            const outputArea = document.getElementById("outputArea");
-            outputArea.select();
-            document.execCommand("copy");
-            alert("Hasil undangan berhasil disalin ke clipboard!");
         }
     </script>
 </body>
