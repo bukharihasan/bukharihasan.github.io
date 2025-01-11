@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Online Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        textarea, input, button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 200px;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .copy-btn {
+            margin-top: 10px;
+            background-color: #28a745;
+        }
+        .copy-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>Undangan Online Generator</h1>
+    <p>Masukkan daftar nama tamu (pisahkan dengan baris baru):</p>
+    <textarea id="guestList" placeholder="Contoh:&#10;Gery Reza Pahlevi&#10;Titania Sai Dipri"></textarea>
+    <button onclick="generateInvitations()">Generate Undangan</button>
+    <div class="output">
+        <h3>Hasil Undangan:</h3>
+        <textarea id="outputArea" readonly placeholder="Hasil undangan akan muncul di sini..."></textarea>
+        <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+
+    <script>
+        function generateInvitations() {
+            const baseUrl = "https://undanganonlineaja.id/titania-bukhari?to=";
+            const guestList = document.getElementById("guestList").value.split("\n");
+            let invitations = "";
+
+            guestList.forEach(guest => {
+                if (guest.trim() !== "") {
+                    const encodedName = encodeURIComponent(guest.trim());
+                    invitations += `
+Bismillahirrahmanirrahim
+Assalamualaikum, Wr. Wb
+Kepada Yth. ${guest}
+Di Tempat
+
+Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara kami.
+
+Berikut link undangan kami, untuk info lengkap dari acara bisa kunjungi:
+${baseUrl}${encodedName}
+
+Merupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.
+
+Mohon maaf perihal undangan hanya di bagikan melalui pesan ini.
+
+Terima kasih banyak atas perhatiannya.
+
+Wassalamualaikum Wr.Wb.
+
+Kami yang berbahagia,
+Titania & Bukhari
+
+--------------------------------------------------------------
+`;
+                }
+            });
+
+            document.getElementById("outputArea").value = invitations.trim();
+        }
+
+        function copyToClipboard() {
+            const outputArea = document.getElementById("outputArea");
+            outputArea.select();
+            document.execCommand("copy");
+            alert("Hasil undangan berhasil disalin ke clipboard!");
+        }
+    </script>
+</body>
+</html>
